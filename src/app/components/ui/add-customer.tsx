@@ -1,15 +1,17 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Customer } from '@/app/types/project-types.ds';
-import { customers } from '../../../../data/customers';
+import { useContext } from "react";
+import { Customers_data } from '@/app/context/context';
 
-export default function AddCustomer() {
-  const [addCustomer, setAddCustomer] = useState<Customer | null>(null);
+export default function AddCustomer({setShowAddCustomerModal} : {setShowAddCustomerModal : any}) {
+  const [ addCustomer, setAddCustomer ] = useState<Customer | null>(null);
+  const { arrCust,setArrCust } = useContext(Customers_data);
 
   const takeAllDataForCustomer = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    let newID = customers.length > 0 ? customers[customers.length - 1].id + 1 : 1;
+    let newID = arrCust.length > 0 ? arrCust[arrCust.length - 1].id + 1 : 1;
 
     const formData = new FormData(event.currentTarget);
     const newCustomer = {
@@ -23,16 +25,38 @@ export default function AddCustomer() {
     };
 
     setAddCustomer(newCustomer);
-    console.log(newCustomer);
+  };
+
+  useEffect(() => {
+    if (addCustomer) {
+      setArrCust((prevState: Customer[]) => [
+        ...prevState,
+        addCustomer,
+      ]);
+      setShowAddCustomerModal(false)
+    }
+  }, [addCustomer, setArrCust]);
+
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowAddCustomerModal(false);
+  };
+
+  const handleModalClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
   };
 
   return (
-    <div className='absolute top-0 left-0 w-screen h-screen bg-gray-400 bg-opacity-50 -mx-2 flex items-center justify-center'>
+    <div className='absolute top-0 left-0 w-screen h-screen bg-gray-400 bg-opacity-50 -mx-2 flex items-center justify-center'
+    onClick={handleOverlayClick}
+    >
         
-      <div className='bg-white w-1/2 h-1/2 p-3 rounded-lg max-w-[700px]'>
+      <div className='bg-white w-1/2 h-1/2 p-3 rounded-lg max-w-[700px]' onClick={handleModalClick}>
         <div className='flex justify-between items-start'>
           <h3 className='text-xl font-bold'>New customer</h3>
-          <button>x</button>
+          <button
+          onClick={() => setShowAddCustomerModal(false)}
+          >x</button>
         </div>
 
         <form className='flex flex-col gap-4 mt-4' onSubmit={takeAllDataForCustomer}>

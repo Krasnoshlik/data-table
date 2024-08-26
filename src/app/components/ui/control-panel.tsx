@@ -1,8 +1,18 @@
 import Image from 'next/image'
 import FilterIcon from '../../assets/filter.png';
 import SearchIcon from '../../assets/Search.png';
+import { useContext } from "react";
+import { Customers_data } from '@/app/context/context';
 
-export default function ControlPanel() {
+export default function ControlPanel({setShowAddCustomerModal, checkedCustomersIds,setCheckedCustomersIds} : {setShowAddCustomerModal: any, checkedCustomersIds : number[],setCheckedCustomersIds: any}) {
+  const { arrCust, setArrCust } = useContext(Customers_data);
+
+  function handleDeleteForSeveralCustomers() {
+    let filteredArrCust = arrCust.filter((e) => {if(!checkedCustomersIds.includes(e.id)) return e });
+    setArrCust(filteredArrCust);
+    setCheckedCustomersIds([]);
+  }
+
   return (
     <section className=' py-2 px-4 flex justify-between'>
         <div className=' flex items-center gap-4'>
@@ -23,7 +33,17 @@ export default function ControlPanel() {
 
         </div>
 
-        <button className=' bg-[#2264E5] min-w-[150px] text-white font-medium rounded-md'>+ Add customer</button>
+        <div className=' flex gap-5'>
+        <button className=' bg-red-600 min-w-[160px] text-white font-medium rounded-md'
+        onClick={() => handleDeleteForSeveralCustomers()}
+        >
+          - Delete customers
+        </button>
+
+        <button 
+        onClick={() => setShowAddCustomerModal(true)}
+        className=' bg-[#2264E5] min-w-[150px] text-white font-medium rounded-md'>+ Add customer</button>
+        </div>
     </section>
   )
 }
